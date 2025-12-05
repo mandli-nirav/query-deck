@@ -57,7 +57,9 @@ export async function POST(request: NextRequest) {
         const queryResult = await pool.query(query);
 
         result = {
-          columns: queryResult.fields.map((field: { name: string }) => field.name),
+          columns: queryResult.fields.map(
+            (field: { name: string }) => field.name
+          ),
           rows: queryResult.rows,
         };
       } finally {

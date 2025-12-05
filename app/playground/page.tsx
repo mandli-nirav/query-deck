@@ -625,7 +625,13 @@ function PlaygroundContent() {
 
 export default function PlaygroundPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className='flex h-screen items-center justify-center'>
+          Loading...
+        </div>
+      }
+    >
       <PlaygroundContent />
     </Suspense>
   );

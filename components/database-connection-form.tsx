@@ -59,6 +59,7 @@ export function DatabaseConnectionForm() {
   >('idle');
   const [databases, setDatabases] = useState<DatabaseInfo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showPrivateIPWarning, setShowPrivateIPWarning] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -70,6 +71,13 @@ export function DatabaseConnectionForm() {
       port: '3306',
     },
   });
+
+  // Check if hostname is localhost or private IP
+  const checkHostname = (hostname: string) => {
+    const isLocalhost = /^(localhost|127\.0\.0\.1|::1)$/i.test(hostname);
+    const isPrivateIP = /^(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)/.test(hostname);
+    setShowPrivateIPWarning(isLocalhost || isPrivateIP);
+  };
 
   const onSubmit = async (data: FormValues) => {
     console.log('Form submitted:', data);
@@ -204,6 +212,10 @@ export function DatabaseConnectionForm() {
                       <Input
                         placeholder='localhost or 192.168.1.1'
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          checkHostname(e.target.value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -265,6 +277,20 @@ export function DatabaseConnectionForm() {
                 )}
               />
             </div>
+
+            {showPrivateIPWarning && (
+              <Alert className='border-amber-500/50 bg-amber-500/10'>
+                <AlertCircle className='h-4 w-4 text-amber-500' />
+                <AlertDescription className='text-amber-600 dark:text-amber-400'>
+                  <strong>Warning:</strong> You're using a localhost or private IP address. 
+                  This will only work when running locally. For deployed applications, use a 
+                  publicly accessible database from services like{' '}
+                  <a href='https://railway.app' target='_blank' rel='noopener noreferrer' className='underline'>Railway</a>,{' '}
+                  <a href='https://supabase.com' target='_blank' rel='noopener noreferrer' className='underline'>Supabase</a>, or{' '}
+                  <a href='https://planetscale.com' target='_blank' rel='noopener noreferrer' className='underline'>PlanetScale</a>.
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className='flex gap-3'>
               <Button
