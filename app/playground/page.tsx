@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, Suspense } from 'react';
 import { Play, Download, Trash2, Copy } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { editor } from 'monaco-editor';
@@ -29,7 +29,7 @@ interface QueryResult {
   executionTime: number;
 }
 
-export default function PlaygroundPage() {
+function PlaygroundContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -476,7 +476,7 @@ export default function PlaygroundPage() {
                 </Button>
                 <Button
                   size='sm'
-                  onClick={executeQuery}
+                  onClick={() => executeQuery()}
                   disabled={isExecuting || !query.trim()}
                 >
                   <Play className='mr-2 h-4 w-4' />
@@ -620,5 +620,13 @@ export default function PlaygroundPage() {
         </div>
       </SidebarProvider>
     </div>
+  );
+}
+
+export default function PlaygroundPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+      <PlaygroundContent />
+    </Suspense>
   );
 }
